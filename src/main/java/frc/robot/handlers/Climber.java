@@ -1,0 +1,88 @@
+package frc.robot.handlers;
+
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.S_Climber;
+
+public class Climber extends SubsystemBase implements StateSubsystem {
+  private ClimberStates desiredState, currentState = ClimberStates.IDLE;
+
+  private S_Climber climber = S_Climber.getInstance();
+
+  private static Climber m_Instance;
+  
+  /** Creates a new Shooter. */
+  private Climber() {}
+
+  public static Climber getInstance() {
+    if(m_Instance == null) {
+      m_Instance = new Climber();
+    }
+
+    return m_Instance;
+  }
+
+  @Override
+  public void setDesiredState(State state) {
+    if(desiredState != state) {
+      desiredState = (ClimberStates) state;
+      handleStateTransition();
+    }
+  }
+
+  @Override
+  public void handleStateTransition() {
+    switch(desiredState) {
+      case IDLE:
+      case BROKEN:
+        climber.stop();
+
+        break;
+
+      case CLIMBING:
+
+        break;
+
+      default:
+
+        break;
+    }
+
+    currentState = desiredState;
+  }
+
+  @Override
+  public void update() {
+    switch(currentState) {
+      case IDLE:
+      case BROKEN:
+      case CLIMBING:
+
+        break;
+
+      default:
+
+        break;
+    }
+
+    if(!climber.checkSubsystem()) {
+      setDesiredState(ClimberStates.BROKEN);
+    }
+  }
+
+  @Override
+  public void periodic() {
+    update();
+  }
+
+  public ClimberStates getState() {
+    return currentState;
+  }
+
+  public enum ClimberStates implements State {
+    IDLE,
+    BROKEN,
+    HOME,
+    CLIMBING,
+    RETURNING;
+  }
+}
