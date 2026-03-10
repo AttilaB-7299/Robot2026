@@ -14,13 +14,13 @@ import frc.robot.handlers.InPivot.InPivotStates;
 import frc.robot.handlers.Intake.IntakeStates;
 import frc.robot.handlers.Turret.TurretStates;
 import frc.robot.handlers.Claw.ClawStates;
-import frc.robot.handlers.ClimbPivot.ClimbPivotStates;
+// import frc.robot.handlers.ClimbPivot.ClimbPivotStates;
 import frc.robot.subsystems.S_Intake;
 import frc.robot.subsystems.S_Shooter;
 import frc.robot.subsystems.S_Turret;
 import frc.robot.subsystems.S_InPivot;
 import frc.robot.subsystems.S_Claw;
-import frc.robot.subsystems.S_ClimbPivot;
+// import frc.robot.subsystems.S_ClimbPivot;
 import frc.robot.subsystems.S_Climber;
 
 @SuppressWarnings("unused")
@@ -32,7 +32,7 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
   private ManagerStates desiredState, currentState = ManagerStates.IDLE;
 
   private S_Shooter shooter = S_Shooter.getInstance();
-  private S_ClimbPivot climbPivot = S_ClimbPivot.getInstance();
+//   private S_ClimbPivot climbPivot = S_ClimbPivot.getInstance();
   private S_Intake intake = S_Intake.getInstance();
   private S_InPivot inPivot = S_InPivot.getInstance();
   private S_Turret turret = S_Turret.getInstance();
@@ -41,7 +41,7 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
 
   private Manager() {
     initialized = shooter.getInitialized();
-    initialized &= climbPivot.getInitialized();
+    // initialized &= climbPivot.getInitialized();
     initialized &= intake.getInitialized();
     initialized &= inPivot.getInitialized();
     initialized &= turret.getInitialized();
@@ -58,7 +58,7 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
   @Override
   public void stop() {
     shooter.stop();
-    climbPivot.stop();
+    // climbPivot.stop();
     intake.stop();
     inPivot.stop();
     turret.stop();
@@ -74,7 +74,7 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
   @Override
   public boolean checkSubsystem() {
     status = shooter.checkSubsystem();
-    status &= climbPivot.checkSubsystem();
+    // status &= climbPivot.checkSubsystem();
     status &= intake.checkSubsystem();
     status &= inPivot.checkSubsystem();
     status &= turret.checkSubsystem();
