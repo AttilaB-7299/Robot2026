@@ -18,8 +18,8 @@ public abstract class OI {
   private OI() {}
 
   // The Driver's joystick
-  public static final CommandXboxController driverController = new CommandXboxController(OIConstants.DRIVER_CONTROLLER_PORT);
-  public static final CommandXboxController auxController = new CommandXboxController(OIConstants.AUX_CONTROLLER_PORT);
+  public static final CommandXboxController driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
+  public static final CommandXboxController auxController = new CommandXboxController(OIConstants.kAuxControllerPort);
 
   public static double getDriveLeftX() {
     return MathUtil.applyDeadband(

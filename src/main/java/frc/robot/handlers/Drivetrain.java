@@ -1,39 +1,46 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package frc.robot.handlers;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.OI;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants;
+import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.subsystems.S_Drivetrain;
-import frc.utils.Utils.ElasticUtil;
+import frc.utils.LimelightHelpers;
+import frc.utils.Utils;
 
-@SuppressWarnings("unused")
 public class Drivetrain extends SubsystemBase implements StateSubsystem {
-
   private DrivetrainStates desiredState, currentState = DrivetrainStates.IDLE;
-  private S_Drivetrain drivetrain = S_Drivetrain.getInstance();
-  private static Drivetrain m_drivetrain;
+  private S_Drivetrain Drivetrain = S_Drivetrain.getInstance();
+  private static Drivetrain m_Instance;
 
+  private PIDController rotController = new PIDController(0.03, 0.003, 0);
+  
+  /** Creates a new Drivetrain. */
   private Drivetrain() {
-    ElasticUtil.putString("Drivetrain state", () -> getState().toString());
+    rotController.setTolerance(1);
+    rotController.setSetpoint(0);
   }
 
   public static Drivetrain getInstance() {
-    if(m_drivetrain == null) {
-      m_drivetrain = new Drivetrain();
+    if(m_Instance == null) {
+      m_Instance = new Drivetrain();
     }
-    return m_drivetrain;
+
+    return m_Instance;
   }
-  public Trigger bindState(Trigger button, DrivetrainStates onTrue, DrivetrainStates onFalse) {
-    return button
-      .onTrue(new InstantCommand(() -> setDesiredState(onTrue), this))
-      .onFalse(new InstantCommand(() -> setDesiredState(onFalse), this));
-  }
+
   @Override
   public void setDesiredState(State state) {
-    if(this.desiredState != state) {
+    if(desiredState != state) {
       desiredState = (DrivetrainStates) state;
       handleStateTransition();
     }
@@ -43,90 +50,99 @@ public class Drivetrain extends SubsystemBase implements StateSubsystem {
   public void handleStateTransition() {
     switch(desiredState) {
       case IDLE:
-        drivetrain.stop();
-        break;
       case BROKEN:
-        drivetrain.stop();
+        Drivetrain.stop();
+
         break;
+
       case DRIVE:
+      case AIMING:
+
         break;
-      case SLOW:
-        break;
+
       case LOCKED:
-        drivetrain.setX();
+        Drivetrain.setX();
+
+        break;
 
       default:
+
         break;
     }
 
     currentState = desiredState;
   }
 
+  @Override
   public void update() {
     switch(currentState) {
       case IDLE:
-        break;
-      case BROKEN:
-        break;
-      case DRIVE:
-        drivetrain.drive(
-          OI.getDriveLeftY(),
-          OI.getDriveLeftX(),
-          OI.getDriveRightX(),
-          true, DriveConstants.SPEED_SCALE
-        );
-        break;
-      case SLOW:
-        drivetrain.drive(
-          OI.getDriveLeftY() * DriveConstants.SLOW_SPEED,
-          OI.getDriveRightX() * DriveConstants.SLOW_SPEED,
-          OI.getDriveRightX() * DriveConstants.SLOW_SPEED,
-          true, DriveConstants.SPEED_SCALE
-          //how the FUCK do we take in 5 values when we only are supposed to give 3 
-        );
-        break;
-      case REVERSE:
-        drivetrain.drive(
-          OI.getDriveLeftY() * -1,
-          OI.getDriveRightX() * -1,
-          OI.getDriveRightX() * -1,
-          false, DriveConstants.SPEED_SCALE
-        );
-        break;
-      case LOCKED:
-          drivetrain.setX();
-          break;
-      //why is this not here but is in handleStateTransition i'm leaving it until someone explains
-      default:
-        break;
-    }
+        setDesiredState(DrivetrainStates.DRIVE);
 
-    if(!drivetrain.checkSubsystem()) {
-      setDesiredState(DrivetrainStates.BROKEN);
+        break;
+      
+      case BROKEN:
+
+        break;
+
+      case DRIVE:
+        if(DriverStation.isTeleopEnabled()) {
+          drive();
+        }
+
+        break;
+
+      case AIMING:
+        if(LimelightHelpers.getTV(Constants.LIMELIGHT_NAME)) {
+          double rotOffset = LimelightHelpers.getTX(Constants.LIMELIGHT_NAME);
+
+          Drivetrain.drive(
+            -MathUtil.applyDeadband(OI.driverController.getLeftY(), DrivetrainConstants.DRIVING_DEADBAND),
+            -MathUtil.applyDeadband(OI.driverController.getLeftX(), DrivetrainConstants.DRIVING_DEADBAND),
+            -Utils.normalize(rotController.calculate(rotOffset)),
+            true, DrivetrainConstants.SPEED_SCALE
+          );
+        } else {
+          drive();
+        }
+        
+        break;
+
+      case LOCKED:
+
+        break;
+
+      default:
+
+        break;
     }
+  }
+
+  private void drive() {
+    Drivetrain.drive(
+      -MathUtil.applyDeadband(OI.driverController.getLeftY(), DrivetrainConstants.DRIVING_DEADBAND),
+      -MathUtil.applyDeadband(OI.driverController.getLeftX(), DrivetrainConstants.DRIVING_DEADBAND),
+      -MathUtil.applyDeadband(OI.driverController.getRightX(), DrivetrainConstants.DRIVING_DEADBAND),
+      true, DrivetrainConstants.SPEED_SCALE
+    );
   }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
     update();
   }
 
-  /**
-   * @return The current state of the subsystem
-   */
-  public DrivetrainStates getState() {
-    return currentState;
+  public Trigger bindState(Trigger button, DrivetrainStates onTrue, DrivetrainStates onFalse) {
+    return button
+      .onTrue(new InstantCommand(() -> setDesiredState(onTrue), m_Instance))
+      .onFalse(new InstantCommand(() -> setDesiredState(onFalse), m_Instance));
   }
 
   public enum DrivetrainStates implements State {
     IDLE,
     BROKEN,
     DRIVE,
-    SLOW,
-    REVERSE,
-    LOCKED,
     AIMING,
-    ALIGNING
+    LOCKED;
   }
 }

@@ -5,10 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -18,7 +15,6 @@ import frc.robot.handlers.Drivetrain.DrivetrainStates;
 import frc.robot.handlers.Manager;
 import frc.robot.handlers.Manager.ManagerStates;
 import frc.robot.subsystems.S_Drivetrain;
-import frc.utils.Utils;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -26,7 +22,6 @@ import frc.utils.Utils;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
-@SuppressWarnings("unused")
 public class RobotContainer {
 
   private SendableChooser<Command> autoChooser = new SendableChooser<Command>();
@@ -66,10 +61,6 @@ public class RobotContainer {
     Drivetrain.getInstance().bindState(OI.driverController.x(), DrivetrainStates.LOCKED, DrivetrainStates.DRIVE);
     // // Removes yaw control and aligns to April tags
     Drivetrain.getInstance().bindState(OI.driverController.a(), DrivetrainStates.AIMING, DrivetrainStates.DRIVE);
-
-    // Intaking
-    //do we need this, we're in drive normally so like can we just delete this
-    Drivetrain.getInstance().bindState(OI.driverController.leftBumper(), DrivetrainStates.DRIVE, DrivetrainStates.DRIVE);
     
     // Zeroes out the gyro
     OI.driverController.start()
