@@ -13,11 +13,13 @@ import frc.robot.handlers.Climber.ClimberStates;
 import frc.robot.handlers.InPivot.InPivotStates;
 import frc.robot.handlers.Intake.IntakeStates;
 import frc.robot.handlers.Turret.TurretStates;
+import frc.robot.handlers.Claw.ClawStates;
 import frc.robot.handlers.ClimbPivot.ClimbPivotStates;
 import frc.robot.subsystems.S_Intake;
 import frc.robot.subsystems.S_Shooter;
 import frc.robot.subsystems.S_Turret;
 import frc.robot.subsystems.S_InPivot;
+import frc.robot.subsystems.S_Claw;
 import frc.robot.subsystems.S_ClimbPivot;
 import frc.robot.subsystems.S_Climber;
 
@@ -35,6 +37,7 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
   private S_InPivot inPivot = S_InPivot.getInstance();
   private S_Turret turret = S_Turret.getInstance();
   private S_Climber climber = S_Climber.getInstance();
+  private S_Claw claw = S_Claw.getInstance();
 
   private Manager() {
     initialized = shooter.getInitialized();
@@ -43,6 +46,7 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
     initialized &= inPivot.getInitialized();
     initialized &= turret.getInitialized();
     initialized &= climber.getInitialized();
+	initialized &= claw.getInitialized();
   }
   public static Manager getInstance() {
     if(m_Instance == null) {
@@ -59,6 +63,7 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
     inPivot.stop();
     turret.stop();
     climber.stop();
+	claw.stop();
   }
 
   @Override
@@ -74,6 +79,7 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
     status &= inPivot.checkSubsystem();
     status &= turret.checkSubsystem();
     status &= climber.checkSubsystem();
+	status &= claw.checkSubsystem();
 
     return status;
   }
@@ -91,81 +97,89 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
     switch(desiredState) {
       case IDLE:
         Shooter.getInstance().setDesiredState(ShooterStates.IDLE);
-        ClimbPivot.getInstance().setDesiredState(ClimbPivot.ClimbPivotStates.IDLE);
+        // ClimbPivot.getInstance().setDesiredState(ClimbPivot.ClimbPivotStates.IDLE);
         Climber.getInstance().setDesiredState(ClimberStates.IDLE);
         Intake.getInstance().setDesiredState(IntakeStates.IDLE);
         InPivot.getInstance().setDesiredState(InPivotStates.IDLE);
         Turret.getInstance().setDesiredState(TurretStates.IDLE);
+		Claw.getInstance().setDesiredState(ClawStates.IDLE);
 
         break;
 
       case DRIVE:
         Shooter.getInstance().setDesiredState(ShooterStates.IDLE);
-        ClimbPivot.getInstance().setDesiredState(ClimbPivot.ClimbPivotStates.HOME);
+        // ClimbPivot.getInstance().setDesiredState(ClimbPivot.ClimbPivotStates.HOME);
         Climber.getInstance().setDesiredState(ClimberStates.HOME);
         Intake.getInstance().setDesiredState(IntakeStates.IDLE);
         InPivot.getInstance().setDesiredState(InPivotStates.HOME);
         Turret.getInstance().setDesiredState(TurretStates.IDLE);
+		Claw.getInstance().setDesiredState(ClawStates.IDLE);
 
         break;
 
       case SHOOTING:
         Shooter.getInstance().setDesiredState(ShooterStates.SHOOTING);
-        ClimbPivot.getInstance().setDesiredState(ClimbPivot.ClimbPivotStates.HOME);
+        // ClimbPivot.getInstance().setDesiredState(ClimbPivot.ClimbPivotStates.HOME);
         Climber.getInstance().setDesiredState(ClimberStates.HOME);
         Intake.getInstance().setDesiredState(IntakeStates.IDLE);
         InPivot.getInstance().setDesiredState(InPivotStates.HOME);
         Turret.getInstance().setDesiredState(TurretStates.IDLE);
+		Claw.getInstance().setDesiredState(ClawStates.HOME);
 
         break;
 
       case PASSING:
         Shooter.getInstance().setDesiredState(ShooterStates.SHOOTING); // Subject to change
-        ClimbPivot.getInstance().setDesiredState(ClimbPivot.ClimbPivotStates.HOME);
+        // ClimbPivot.getInstance().setDesiredState(ClimbPivot.ClimbPivotStates.HOME);
         Climber.getInstance().setDesiredState(ClimberStates.HOME);
         Intake.getInstance().setDesiredState(IntakeStates.IDLE);
         InPivot.getInstance().setDesiredState(InPivotStates.HOME);
         Turret.getInstance().setDesiredState(TurretStates.PASSING);
+		Claw.getInstance().setDesiredState(ClawStates.IDLE);
 
         break;
 
       case INTAKING:
 
         Shooter.getInstance().setDesiredState(ShooterStates.IDLE);
-        ClimbPivot.getInstance().setDesiredState(ClimbPivot.ClimbPivotStates.HOME);
+        // ClimbPivot.getInstance().setDesiredState(ClimbPivot.ClimbPivotStates.HOME);
         Climber.getInstance().setDesiredState(ClimberStates.HOME);
         Intake.getInstance().setDesiredState(IntakeStates.INTAKING);
         InPivot.getInstance().setDesiredState(InPivotStates.INTAKING);
         Turret.getInstance().setDesiredState(TurretStates.IDLE);
+		Claw.getInstance().setDesiredState(ClawStates.IDLE);
 
         break;
 
       case OUTPUTTING:
         Shooter.getInstance().setDesiredState(ShooterStates.IDLE);
         Climber.getInstance().setDesiredState(ClimberStates.HOME);
-        ClimbPivot.getInstance().setDesiredState(ClimbPivotStates.HOME);
+        // ClimbPivot.getInstance().setDesiredState(ClimbPivotStates.HOME);
         Intake.getInstance().setDesiredState(IntakeStates.OUTPUTTING);
         InPivot.getInstance().setDesiredState(InPivotStates.INTAKING);
         Shooter.getInstance().setDesiredState(ShooterStates.IDLE);
         Turret.getInstance().setDesiredState(TurretStates.IDLE);
+		Claw.getInstance().setDesiredState(ClawStates.IDLE);
 
         break;
 
       case CLIMBING:
         Shooter.getInstance().setDesiredState(ShooterStates.IDLE);
         Climber.getInstance().setDesiredState(ClimberStates.CLIMBING);
-        ClimbPivot.getInstance().setDesiredState(ClimbPivotStates.CLIMBING);
+        // ClimbPivot.getInstance().setDesiredState(ClimbPivotStates.CLIMBING);
         Intake.getInstance().setDesiredState(IntakeStates.IDLE);
         InPivot.getInstance().setDesiredState(InPivotStates.HOME);
         Shooter.getInstance().setDesiredState(ShooterStates.IDLE);
         Turret.getInstance().setDesiredState(TurretStates.IDLE);
+		Claw.getInstance().setDesiredState(ClawStates.HOLDING);
 
         break;
 
       case LOWERING:
         Shooter.getInstance().setDesiredState(ShooterStates.IDLE);
         Climber.getInstance().setDesiredState(ClimberStates.RETURNING);
-        ClimbPivot.getInstance().setDesiredState(ClimbPivotStates.RETURNING);
+		Claw.getInstance().setDesiredState(ClawStates.HOLDING);
+        // ClimbPivot.getInstance().setDesiredState(ClimbPivotStates.RETURNING);
         Intake.getInstance().setDesiredState(IntakeStates.IDLE);
         InPivot.getInstance().setDesiredState(InPivotStates.HOME);
         Shooter.getInstance().setDesiredState(ShooterStates.IDLE);

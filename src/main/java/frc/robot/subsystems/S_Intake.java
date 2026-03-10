@@ -15,7 +15,7 @@ public class S_Intake extends SubsystemBase implements CheckableSubsystem {
   private static S_Intake m_Intake;
 
   public S_Intake() {
-    intakeMotor = new SparkMax(6, MotorType.kBrushless);
+    intakeMotor = new SparkMax(99997, MotorType.kBrushless);
     initialized = true;
   }
 

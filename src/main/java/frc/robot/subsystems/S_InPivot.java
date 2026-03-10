@@ -15,7 +15,7 @@ public class S_InPivot extends SubsystemBase implements CheckableSubsystem {
   private static S_InPivot m_InPivot;
 
   public S_InPivot() {
-    inPivotMotor = new SparkMax(6, MotorType.kBrushless);
+    inPivotMotor = new SparkMax(99996, MotorType.kBrushless);
     initialized = true;
   }
 

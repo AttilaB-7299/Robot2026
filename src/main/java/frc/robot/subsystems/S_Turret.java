@@ -14,7 +14,7 @@ public class S_Turret extends SubsystemBase implements CheckableSubsystem {
   private static S_Turret m_Turret;
 
   public S_Turret() {
-    turretMotor = new SparkMax(6, MotorType.kBrushless);
+    turretMotor = new SparkMax(99993, MotorType.kBrushless);
     initialized = true;
   }
 
